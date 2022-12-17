@@ -4,7 +4,7 @@ region = "ap-south-1"
 # AWS API Gateway rest api
 
 enable_api_gateway_rest_api      = true
-api_gateway_rest_api_name        = "nfl-api-gateway"
+api_gateway_rest_api_name        = "dev-api-gateway"
 api_gateway_rest_api_description = "api gateway description"
 endpoint_type                    = "REGIONAL"
 
@@ -37,7 +37,7 @@ api_gateway_usage_plan_description = "usage_description"
 #---------------------------------------------------
 # AWS API Gateway resource
 enable_api_gateway_resource    = true
-api_gateway_resource_path_part = "nfl-proxy"
+api_gateway_resource_path_part = "dev-proxy"
 
 # AWS API Gateway method
 enable_api_gateway_method           = true
