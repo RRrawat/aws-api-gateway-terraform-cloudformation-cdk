@@ -48,7 +48,7 @@ api_gateway_method_api_key_required = true
 enable_api_gateway_integration                  = true
 api_gateway_integration_type                    = "AWS"
 api_gateway_integration_integration_http_method = "POST"
-api_gateway_integration_uri                     = "arn:aws:apigateway:ap-south-1:lambda:path/2015-03-31/functions/arn:aws:lambda:ap-south-1:306406016812:function:getAccessToken/invocations"
+api_gateway_integration_uri                     = "<URI of the Lambda function>"
 
 # AWS API Gateway method response
 api_gateway_method_response_status_code        = 200
