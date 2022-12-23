@@ -4,7 +4,7 @@ Parameters:
   LamdaArn:
     Type: String
     Description: lambda function arn 
-    Default: 'arn:aws:lambda:us-east-1:318493754102:function:nfl-lambda'
+    Default: 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:AppFunction'
   apiGatewayName:
     Type: String
     Description: name of the api gateway
@@ -75,7 +75,7 @@ Resources:
         Uri: !Join 
           - ''
           - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/
-            - !Ref LamdaArn
+            - !Ref arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:AppFunction
             - '/invocations'
 
       ResourceId: !Ref checksmsck
@@ -85,7 +85,7 @@ Resources:
       FunctionName: !Ref AppFunction
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiGateway}/*/POST/checksms_ck'
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiGateway}/*/*/*'
   AuthorizersCognitoUserPools:
     Type: AWS::ApiGateway::Authorizer
     Properties:
