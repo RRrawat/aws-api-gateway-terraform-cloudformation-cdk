@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: API Gateway
+Parameters:
+  LamdaArn:
+    Type: String
+    Description: lambda function arn 
+    Default: 'arn:aws:lambda:us-east-1:318493754102:function:nfl-lambda'
+  apiGatewayName:
+    Type: String
+    Description: name of the api gateway
+    Default: CheckSMSOptIn
+  AppFunction:
+    Type: String
+    Description: Name of the lambda function
+  apiGatewayStageName:
+    Type: String
+    Description: name of the stage in the api gateway
+    AllowedPattern: '[a-z0-9]+'
+    Default: prod
+  CognitoUserPoolArn:
+    Description: ARN of the Cognito User Pool
+    Type: String
+    Default: 'arn:aws:cognito-idp:us-east-1:996656702859:userpool/us-east-1_wl3f0KSB5'
+  CognitoAppClientScope:
+    Description: Scope of the resource in cognito User Pool
+    Type: String
+    Default: 'checksmsoptinauthorizer3/post'
+Resources:
+  apiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: nfl api gateway
+      Policy: 
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: 'execute-api:Invoke'
+            Resource: 'execute-api:/*/*/*'
+          - Effect: Deny
+            Principal: '*'
+            Action: 'execute-api:Invoke'
+            Resource: 'execute-api:/*/*/*'
+            Condition:
+              NotIpAddress:
+                'aws:SourceIp':
+                  - 
+                  
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Name: !Ref apiGatewayName
+  checksmsck:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      RestApiId: !Ref apiGateway
+      ParentId: !GetAtt 
+        - apiGateway
+        - RootResourceId
+      PathPart: checksms_ck
+  apiGatewayRootMethod:
+    Type: AWS::ApiGateway::Method
+    DependsOn: AppFunctionPermission
+    Properties:
+      RestApiId: !Ref apiGateway
+      HttpMethod: POST
+      AuthorizationType: COGNITO_USER_POOLS
+      AuthorizationScopes:
+        - !Ref CognitoAppClientScope
+      AuthorizerId: !Ref AuthorizersCognitoUserPools
+      Integration:
+        Type: AWS
+        IntegrationHttpMethod: POST
+        Uri: !Join 
+          - ''
+          - - !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/
+            - !Ref LamdaArn
+            - '/invocations'
+
+      ResourceId: !Ref checksmsck
+  AppFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AppFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiGateway}/*/POST/checksms_ck'
+  AuthorizersCognitoUserPools:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: CognitoAuthorizer
+      Type: COGNITO_USER_POOLS
+      RestApiId: !Ref apiGateway
+      IdentitySource: method.request.header.authorizationToken
+      ProviderARNs:
+        - !Ref CognitoUserPoolArn
+  apiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - apiGatewayRootMethod
+    Properties:
+      RestApiId: !Ref apiGateway
+      StageName: !Ref apiGatewayStageName
+Outputs:
+  apiGatewayInvokeURL:
+    Value: !Sub >-
+      https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/${apiGatewayStageName}
