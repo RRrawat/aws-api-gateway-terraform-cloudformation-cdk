@@ -44,7 +44,8 @@ Resources:
             Condition:
               NotIpAddress:
                 'aws:SourceIp':
-                  - 
+                  - [your ip address]
+                  - [CIDR block]
                   
       EndpointConfiguration:
         Types:
