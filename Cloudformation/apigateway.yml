@@ -1,11 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: API Gateway
 Parameters:
-  LamdaArn:
-    Type: String
-    Description: lambda function arn 
-    Default: 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:AppFunction'
-  apiGatewayName:
+apiGatewayName:
     Type: String
     Description: name of the api gateway
     Default: CheckSMSOptIn
