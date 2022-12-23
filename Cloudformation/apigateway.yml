@@ -4,10 +4,11 @@ Parameters:
 apiGatewayName:
     Type: String
     Description: name of the api gateway
-    Default: CheckSMSOptIn
+    Default: Test-api-gateway
   AppFunction:
     Type: String
     Description: Name of the lambda function
+    Default: Test-lambda
   apiGatewayStageName:
     Type: String
     Description: name of the stage in the api gateway
@@ -25,7 +26,7 @@ Resources:
   apiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Description: nfl api gateway
+      Description: test api gateway
       Policy: 
         Version: 2012-10-17
         Statement:
@@ -54,7 +55,7 @@ Resources:
       ParentId: !GetAtt 
         - apiGateway
         - RootResourceId
-      PathPart: checksms_ck
+      PathPart: test
   apiGatewayRootMethod:
     Type: AWS::ApiGateway::Method
     DependsOn: AppFunctionPermission
