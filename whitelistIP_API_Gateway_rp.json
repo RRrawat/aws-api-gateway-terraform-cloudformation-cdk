@@ -14,7 +14,10 @@
       "Resource": "execute-api:/*/*/*",
       "Condition": {
         "NotIpAddress": {
-          "aws:SourceIp": ["YOUR IP ADDRESS", "IP CIDR BLOCK"]
+          "aws:SourceIp": [
+            "YOUR IP ADDRESS", 
+            "IP CIDR BLOCK"
+          ]
         }
       }
     }
