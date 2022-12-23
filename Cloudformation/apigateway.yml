@@ -17,7 +17,7 @@ apiGatewayName:
   CognitoUserPoolArn:
     Description: ARN of the Cognito User Pool
     Type: String
-    Default: 'arn:aws:cognito-idp:us-east-1:996656702859:userpool/us-east-1_wl3f0KSB5'
+    Default: 'arn:aws:cognito-idp:us-east-1:##############:userpool/us-east-1_wl3f0KSB5'
   CognitoAppClientScope:
     Description: Scope of the resource in cognito User Pool
     Type: String
