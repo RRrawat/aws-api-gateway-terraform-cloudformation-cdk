@@ -11,7 +11,7 @@ Parameters:
  s3bucket :
   Type: String
   Description: S3 bucket where lambda source code zip file is placed
-  Default: CallPCMSMSOptInCheckService
+  Default: tests3bucket
  s3bucketKey:
   Type: String
   Description: path and name of zip file for lambda source code
