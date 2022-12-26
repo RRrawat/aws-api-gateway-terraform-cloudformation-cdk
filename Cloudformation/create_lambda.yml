@@ -4,7 +4,7 @@ Parameters:
  LambdaName:
   Type : String
   Description: Name of the lambda function 
-  Default: CallPCMSMSOptInCheckService_customerkey
+  Default: test_lambda
  VpcId:
   Description: VpcId to deploy into
   Type: 'AWS::EC2::VPC::Id'
