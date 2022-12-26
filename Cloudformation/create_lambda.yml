@@ -15,7 +15,7 @@ Parameters:
  s3bucketKey:
   Type: String
   Description: path and name of zip file for lambda source code
-  Default: prod/CallPCMSMSOptInCheckService_customerkey.zip
+  Default: prod/test.zip
  subnetid1:
   Type: 'AWS::EC2::Subnet::Id'
   Description: Select the first subnet for lambda function
