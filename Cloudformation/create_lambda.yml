@@ -39,6 +39,7 @@ Resources:
         GroupName: Security Group for Epsilon Lambda 
         GroupDescription: Security group for Lambda function
         VpcId: !Ref VpcId
+        
   IAMPolicy:
             Type: 'AWS::IAM::Policy'
             DependsOn: LambdaRole
