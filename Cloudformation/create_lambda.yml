@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Cloudformation Template to create and configure Epsilon Proxy Lambda function to check sms optin/out preference.
+Description: Cloudformation Template to create and configure Lambda function.
 Parameters: 
  LambdaName:
   Type : String
