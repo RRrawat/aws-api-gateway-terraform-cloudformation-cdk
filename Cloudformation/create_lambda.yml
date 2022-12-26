@@ -1,0 +1,164 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cloudformation Template to create and configure Epsilon Proxy Lambda function to check sms optin/out preference.
+Parameters: 
+ LambdaName:
+  Type : String
+  Description: Name of the lambda function 
+  Default: CallPCMSMSOptInCheckService_customerkey
+ VpcId:
+  Description: VpcId to deploy into
+  Type: 'AWS::EC2::VPC::Id'
+ s3bucket :
+  Type: String
+  Description: S3 bucket where lambda source code zip file is placed
+  Default: CallPCMSMSOptInCheckService
+ s3bucketKey:
+  Type: String
+  Description: path and name of zip file for lambda source code
+  Default: prod/CallPCMSMSOptInCheckService_customerkey.zip
+ subnetid1:
+  Type: 'AWS::EC2::Subnet::Id'
+  Description: Select the first subnet for lambda function
+ subnetid2 :
+  Type: 'AWS::EC2::Subnet::Id'
+  Description: Select the second subnet for lambda function
+ apikeySecretManagerName:
+  Type: String
+  Description: arn parameter of api keys secret manager name. Lambda will be only reading this secret.
+  Default: AEP/PCM/APIKeys-MceAwr
+ AccessTokenSecretManagerName:
+  Type: String
+  Description: arn parameter of AccessToken secret manager name. Lambda will be reading and writing this secret.
+  Default: AEP/PCM/AccessToken-8WKFDS
+ 
+Resources:
+
+  InstanceSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupName: Security Group for Epsilon Lambda 
+        GroupDescription: Security group for Lambda function
+        VpcId: !Ref VpcId
+  IAMPolicy:
+            Type: 'AWS::IAM::Policy'
+            DependsOn: LambdaRole
+            Properties:
+                PolicyName: checksms-lambda-role-policy
+                PolicyDocument: {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "logs:CreateLogGroup",
+            "Resource": {"Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"}
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": [
+                {"Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaName}:*"}
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:GetSecretValue"
+            ],
+            "Resource": {"Fn::Sub": "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${apikeySecretManagerName}"} 
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Resource": {"Fn::Sub": "arn:aws:s3:::${s3bucket}" }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:PutSecretValue"
+            ],
+            "Resource": {"Fn::Sub": "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${AccessTokenSecretManagerName}" }
+        }    
+    ]
+}               
+                Roles:
+                - !Ref LambdaRole
+            
+  LambdaRole:
+    Type: AWS::IAM::Role
+    DependsOn: InstanceSecurityGroup
+    Properties:
+      RoleName: checksms-lambda-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+            - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+              - lambda.amazonaws.com
+        Version: 2012-10-17
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: IAMPolicy
+    Properties:
+      FunctionName: !Ref LambdaName  
+      Description: LambdaFunction for epsilon  
+      Runtime: python3.7
+      Code:
+        S3Bucket: !Ref s3bucket  
+        S3Key: !Ref s3bucketKey 
+      Handler: lambda_function.lambda_handler
+      MemorySize: 512
+      Timeout: 900
+      Role:
+        Fn::GetAtt:
+          - LambdaRole
+          - Arn
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref InstanceSecurityGroup
+        SubnetIds:
+          - !Ref subnetid1
+          - !Ref subnetid2
+
+Outputs:
+  LambdaRoleARN:
+    Description: Role for Lambda execution.
+    Value:
+      Fn::GetAtt:
+        - LambdaRole
+        - Arn
+    Export:
+      Name:
+        Fn::Sub: LambdaRole
+  LambdaFunctionName:
+    Value:
+      Ref: LambdaFunction
+  LambdaFunctionARN:
+    Description: Lambda function ARN.
+    Value:
+      Fn::GetAtt:
+        - LambdaFunction
+        - Arn
+    Export:
+      Name:
+        Fn::Sub: LambdaARN-prod
