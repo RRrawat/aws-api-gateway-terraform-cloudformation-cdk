@@ -15,17 +15,17 @@ export class CdkStarterStack extends cdk.Stack {
 
     // ... rest
 
-    // 👇 define GET todos function
+    //  define GET todos function
     const getTodosLambda = new lambda.Function(this, 'get-todos-lambda', {
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: 'index.main',
       code: lambda.Code.fromAsset(path.join(__dirname, '/../src/get-todos')),
     });
 
-    // 👇 add a /todos resource
+    // add a /todos resource
     const todos = api.root.addResource('todos');
 
-    // 👇 integrate GET /todos with getTodosLambda
+    //  integrate GET /todos with getTodosLambda
     todos.addMethod(
       'GET',
       new apigateway.LambdaIntegration(getTodosLambda, {proxy: true}),
