@@ -10,7 +10,7 @@ export class CdkStarterStack extends cdk.Stack {
       deployOptions: {
         stageName: 'dev',
       },
-      // 👇 enable CORS
+      // enable CORS
       defaultCorsPreflightOptions: {
         allowHeaders: [
           'Content-Type',
@@ -24,7 +24,7 @@ export class CdkStarterStack extends cdk.Stack {
       },
     });
 
-    // 👇 create an Output for the API URL
+    // create an Output for the API URL
     new cdk.CfnOutput(this, 'apiUrl', {value: api.url});
   }
 }
