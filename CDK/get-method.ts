@@ -1,3 +1,8 @@
+// Adding Resources to API Gateway in AWS CDK
+//We are going to create 2 endpoints for our API:
+//todos with HTTP GET
+//todos/{todoId} with HTTP DELETE
+
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as cdk from 'aws-cdk-lib';
